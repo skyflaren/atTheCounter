@@ -25,6 +25,7 @@ public class KeyInput extends KeyAdapter{
                 if (key == KeyEvent.VK_S) player.setKeyDown(1, true);
                 if (key == KeyEvent.VK_A) player.setKeyDown(2, true);
                 if (key == KeyEvent.VK_D) player.setKeyDown(3, true);
+                if (key == KeyEvent.VK_SPACE) player.setSpaceDown(true);
             }
         }
     }
@@ -43,6 +44,7 @@ public class KeyInput extends KeyAdapter{
                 if (key == KeyEvent.VK_S) player.setKeyDown(1, false);
                 if (key == KeyEvent.VK_A) player.setKeyDown(2, false);
                 if (key == KeyEvent.VK_D) player.setKeyDown(3, false);
+                if (key == KeyEvent.VK_SPACE) player.setSpaceDown(false);
             }
         }
     }

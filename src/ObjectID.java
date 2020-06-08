@@ -4,5 +4,6 @@ public enum ObjectID {
     Garbage(),
     Sanitizer(),
     Mask(),
+    Gloves,
     Decor();
 }

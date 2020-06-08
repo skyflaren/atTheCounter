@@ -19,7 +19,7 @@ public class Object extends GameObject{
     }
 
     public void tick() {
-        if (Game.status.equals("scroll")) {
+        if (Game.gameState == State.Game || Game.gameState == State.Tutorial) {
             x += 4;
         }
     }

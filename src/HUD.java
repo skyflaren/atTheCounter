@@ -21,7 +21,7 @@ public class HUD {
     }
     
     public void incrementRisk(int inc) {
-        risk += inc;
+        if (Game.gameState != State.Tutorial) risk += inc;
     }
 
     public void tick() {
