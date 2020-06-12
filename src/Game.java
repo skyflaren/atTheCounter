@@ -1,8 +1,13 @@
 import java.awt.Canvas;
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.Graphics;
+import java.awt.GraphicsEnvironment;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 public class Game extends Canvas implements Runnable{
     
@@ -11,24 +16,53 @@ public class Game extends Canvas implements Runnable{
     private Thread thread;
     private boolean running = false;
     private Handler handler;
-    
+    private Window window;
     private Menu menu;
     
     //Spawns objects during the scrolling phase
     private Spawner obstacleSpawner, powerupSpawner, decorSpawner; 
     private GameObjectSpawner gameObjectSpawner; 
+    private Player player;
     
     //Loads Images
-    private BufferedImage bg;
+    private BufferedImage bg, powerups, obstacles, decor, charSprites, managerSprites, mopBucket, counterLeft, counterRight, menuImage, gameOverImage, lobbyBg,
+    creditsImage, infoImage, exitMat, startMat, soupImage, washroomMat;
     private BufferedImageLoader loader;
-    
+        
     public static State gameState = State.Menu;
+    public static int objectSpeed = 4;
     
     //Constructor, initializes all the objects and assets
     public Game() {
         
         loader = new BufferedImageLoader();
         bg = loader.loadImage("/background.png");
+        powerups = loader.loadImage("/powerup_sprite_sheet.png");
+        obstacles = loader.loadImage("/obstacle_sprite_sheet.png");
+        decor = loader.loadImage("/wall_decor_sprite_sheet.png");
+        charSprites = loader.loadImage("/character_sprite_sheet.png");
+        managerSprites = loader.loadImage("/manager_sprite_sheet.png");
+        mopBucket = loader.loadImage("/mop_bucket.png");
+        counterLeft = loader.loadImage("/counter_left.png");
+        counterRight = loader.loadImage("/counter_right.png");
+        menuImage = loader.loadImage("/menu.png");
+        gameOverImage = loader.loadImage("/game_over.png");
+        lobbyBg = loader.loadImage("/lobby_background.png");
+        creditsImage = loader.loadImage("/credits.png");
+        infoImage = loader.loadImage("/info.png");
+        soupImage = loader.loadImage("/soup.png");
+        exitMat = loader.loadImage("/exit_mat.png");
+        startMat = loader.loadImage("/start_mat.png");
+        washroomMat = loader.loadImage("/washroom_mat.png");
+        
+        try {
+            GraphicsEnvironment ge = 
+                GraphicsEnvironment.getLocalGraphicsEnvironment();
+            Font wonder = Font.createFont(Font.TRUETYPE_FONT, getClass().getClassLoader().getResourceAsStream("wonder.ttf"));
+            ge.registerFont(wonder);
+       } catch (IOException|FontFormatException e) {
+           e.printStackTrace();
+       }
         
         handler = new Handler();
         menu = new Menu(this, handler);
@@ -36,7 +70,11 @@ public class Game extends Canvas implements Runnable{
         this.addKeyListener(new KeyInput(handler));
         this.addMouseListener(menu);
         
-        new Window(WIDTH, HEIGHT, "AT THE COUNTER", this);
+        window = new Window(WIDTH, HEIGHT, "AT THE COUNTER", this);
+    }
+    
+    public void close() {
+        window.frame.dispatchEvent(new WindowEvent(window.frame, WindowEvent.WINDOW_CLOSING));
     }
 
     public synchronized void start() {
@@ -91,13 +129,32 @@ public class Game extends Canvas implements Runnable{
         if (gameState == State.Menu) {
             menu.tick();
         }
-        if (gameState == State.Tutorial) {
+        else if (gameState == State.Tutorial) {
             handler.tick();
         }
-        if (gameState == State.Game) {
+        else if (gameState == State.Lobby) {
+            handler.tick();
+        }
+        else if (gameState == State.Minigame1) { // Mop
+//            minigame1.tick();
+        }
+        else if (gameState == State.Minigame2) { // Soup
+            //minigame2.tick();
+        }
+        else if (gameState == State.Info) {
+            //info.tick();
+        }
+        else if (gameState == State.Credits) {
+            //credits.tick();
+        }
+        else if (gameState == State.Game) {
             handler.tick();
             gameObjectSpawner.tick();
             decorSpawner.tick();
+        }
+        else if (gameState == State.GameOver) {
+            menu.setScore(player.getScore());
+            menu.tick();
         }
     }
     
@@ -111,17 +168,44 @@ public class Game extends Canvas implements Runnable{
         Graphics g = bs.getDrawGraphics();
         
         if (gameState == State.Menu) {
-            g.setColor(Color.BLACK);
-            g.fillRect(0, 0, WIDTH, HEIGHT);
+            g.drawImage(menuImage, 0, 0, null);
             menu.render(g);
         }
-        if (gameState == State.Tutorial) {
+        else if (gameState == State.Tutorial) {
             g.drawImage(bg,0,0,null);
             handler.render(g);
         }
-        if (gameState == State.Game) {
+        else if (gameState == State.Lobby) {
+            g.drawImage(lobbyBg,0,0,null);
+            handler.render(g);
+        }
+        else if (gameState == State.Minigame1) {
+            g.setColor(Color.BLACK);
+            g.fillRect(0, 0, WIDTH, HEIGHT);
+            //minigame1.render()
+        }
+        else if (gameState == State.Minigame2) {
+            g.setColor(Color.BLACK);
+            g.fillRect(0, 0, WIDTH, HEIGHT);
+            //minigame2.render()
+        }
+        else if (gameState == State.Info) {
+            g.setColor(Color.BLACK);
+            g.fillRect(0, 0, WIDTH, HEIGHT);
+            //info.render()
+        }
+        else if (gameState == State.Credits) {
+            g.setColor(Color.BLACK);
+            g.fillRect(0, 0, WIDTH, HEIGHT);
+            //credits.render()
+        }
+        else if (gameState == State.Game) {
             g.drawImage(bg,0,0,null);
             handler.render(g);
+        }
+        else if (gameState == State.GameOver) {
+            g.drawImage(gameOverImage,0,0,null);
+            menu.render(g);
         }
         
         g.dispose();
@@ -129,18 +213,48 @@ public class Game extends Canvas implements Runnable{
     }
     
     public void startLevel() {
-        new Player(400,350,128,12,0,-104, loader.loadImage("/character_sprite_sheet.png"), new HUD(), ID.Player, handler, this);
+        player = new Player(400,350,64,12,-40,-104, charSprites, managerSprites, new HUD(), ID.Player, handler, this);
         
         obstacleSpawner = new Spawner(2, 80, 4, 200, 5, 60, 60, new ObjectID[] {ObjectID.Crowd, ObjectID.Garbage}, 
-                loader.loadImage("/obstacle_sprite_sheet.png"), handler);
+                obstacles, handler);
         
         powerupSpawner = new Spawner(3, 1800, 1, 200, 5, 60, 60, new ObjectID[] {ObjectID.Mask, ObjectID.Sanitizer, ObjectID.Gloves},
-                loader.loadImage("/powerup_sprite_sheet.png"), handler);
+                powerups, handler);
         
         gameObjectSpawner = new GameObjectSpawner(new Spawner[] {obstacleSpawner, powerupSpawner}, 200, 5, 60, 60, handler);
         
-        decorSpawner = new Spawner(4, 240, 1, 0, 1, 200, 200, new ObjectID[] {ObjectID.Decor, ObjectID.Decor, ObjectID.Decor, ObjectID.Decor}, 
-                loader.loadImage("/wall_decor_sprite_sheet.png"), handler);
+        decorSpawner = new Spawner(5, 240, 1, 0, 1, 200, 200, new ObjectID[] {ObjectID.Decor, ObjectID.Decor, ObjectID.Decor, ObjectID.Decor, ObjectID.Decor}, 
+                decor, handler);
+    }
+    
+    public void loadLobby() {
+        new Object(140, 235, 50, 27, 0, 0,
+                soupImage,
+                ObjectID.Mini2, ID.CollidableObject, handler);
+        new Object(0, 200, 46, 90, 0, 0,
+                counterLeft,
+                ObjectID.Misc, ID.CollidableObject, handler);
+        new Object(46, 234, 244, 56, -46, -34,
+                counterRight,
+                ObjectID.Misc, ID.CollidableObject, handler);
+        new Object(400, 390, 82, 94, 0, 0, 
+                mopBucket, 
+                ObjectID.Mini1, ID.CollidableObject, handler);
+        new Object(300, 106, 123, 94, 0, -64,
+                infoImage,
+                ObjectID.Info, ID.CollidableObject, handler);
+        new Object(472, 83, 73, 117, 0, -52,
+                creditsImage,
+                ObjectID.Credits, ID.CollidableObject, handler);
+        new Object(6, 320, 44, 109, 0, 0,
+                startMat,
+                ObjectID.StartMat, ID.NonCollidableObject, handler);
+        new Object(753, 218, 41, 113, 0, 0,
+                exitMat,
+                ObjectID.ExitMat, ID.NonCollidableObject, handler);
+        new Object(753, 360, 41, 113, 0, 0,
+                washroomMat,
+                ObjectID.WashroomMat, ID.NonCollidableObject, handler);
     }
     
     //Helper method that squishes values into a specified range

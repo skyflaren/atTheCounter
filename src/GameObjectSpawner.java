@@ -35,10 +35,10 @@ public class GameObjectSpawner {
         
         for (int i = 0; i < spawners.length; i++) { //Processes each spawner
             Spawner spawner = spawners[i];
-            spawner.setCounter(spawner.getCounter()+1);
+            spawner.setCounter(spawner.getCounter()+(Game.objectSpeed/3));
             int counter = spawner.getCounter(), freq = spawner.getFreq(), maxSpawn = spawner.getMaxSpawn(), objectCnt = spawner.getObjectCnt();
             
-            if (counter == freq) { //Attempts a spawn
+            if (counter >= freq) { //Attempts a spawn
                 for (int j = 0; j < maxSpawn; j++) {
                     int lane = (int)(Math.random()*spawnRange);
                     lanes[lane][0] = i; //Assigns the object group

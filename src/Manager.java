@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 public class Manager extends GameObject{
     
     private BufferedImage managerImage;
+    private BufferedImage[] dialogImage = new BufferedImage[7];
     private SpriteSheet ss;
     private SpriteSheet dialog;
     
@@ -25,13 +26,18 @@ public class Manager extends GameObject{
         this.player = player;
         ss = new SpriteSheet(img, 128, 128);
         dialog = new SpriteSheet(loader.loadImage("dialog.png"),100,800);
-        this.player = player;
+        
+        for (int i = 0; i < 7; i++) {
+            dialogImage[i] = dialog.grabImage(i, 0, 800, 100);
+        }
+        
         managerImage = ss.grabImage(dir, 0, 128, 128);
     }
     
     public void tick() {
         if (Game.gameState == State.Tutorial) {
-            if (player.getTutStage() == 0) {
+            int tutStage = player.getTutStage();
+            if (tutStage == 0) {
                 if (x < 128) {
                     animFinished = false;
                     velX = 2;
@@ -44,7 +50,7 @@ public class Manager extends GameObject{
                 }
             }
             
-            if (player.getTutStage() == 2) {
+            else if (tutStage == 2) {
                 if (x > -128) {
                     velX = -2;
                     kd = true;
@@ -57,7 +63,7 @@ public class Manager extends GameObject{
                 }
             }
             
-            if (player.getTutStage() == 4) {
+            else if (tutStage == 4) {
                 if (x < 128) {
                     animFinished = false;
                     velX = 2;
@@ -70,7 +76,7 @@ public class Manager extends GameObject{
                 }
             }
             
-            if (player.getTutStage() == 5) {
+            else if (tutStage == 5) {
                 if (x > -128) {
                     velX = -2;
                     kd = true;
@@ -83,7 +89,7 @@ public class Manager extends GameObject{
                 }
             }
             
-            if (player.getTutStage() == 7) {
+            else if (tutStage == 7) {
                 if (x < 128) {
                     animFinished = false;
                     velX = 2;
@@ -96,7 +102,7 @@ public class Manager extends GameObject{
                 }
             }
             
-            if (player.getTutStage() == 8) {
+            else if (tutStage == 8) {
                 if (x > -128) {
                     velX = -2;
                     kd = true;
@@ -142,9 +148,10 @@ public class Manager extends GameObject{
                 kd = false;
             }
             mTick++;
+            
+            
         }
     }
-
     public void render(Graphics g) {
         g.drawImage(managerImage, x+xdispl, y+ydispl, null);
         int tutStage = player.getTutStage();
@@ -158,7 +165,7 @@ public class Manager extends GameObject{
             dialogNum = tutStage-2;
         }
         if (tutStage != 3 && tutStage != 6 && dialogNum < 7) {
-            g.drawImage(dialog.grabImage(dialogNum, 0, 800, 100), 0, 400, null);
+            g.drawImage(dialogImage[dialogNum], 0, 400, null);
         }
     }
 

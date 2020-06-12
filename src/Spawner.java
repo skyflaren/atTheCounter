@@ -25,8 +25,8 @@ public class Spawner {
     }
     
     public void tick() {
-        counter++;
-        if (counter == freq) {
+        counter += (Game.objectSpeed/3);
+        if (counter >= freq) {
             int[] lanes = new int[spawnRange]; //Allows only one object to be spawned in each lane
             for (int i = 0; i < maxSpawn; i++) { //Attempts to spawn objects
                 int lane = (int)(Math.random()*spawnRange); //Picks the lane

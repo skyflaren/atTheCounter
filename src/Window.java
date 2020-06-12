@@ -4,10 +4,12 @@ import java.awt.Dimension;
 import javax.swing.JFrame;
 
 public class Window extends Canvas{
+    
+    public JFrame frame;
 
     //Constructor
     public Window(int w, int h, String title, Game game) {
-        JFrame frame = new JFrame(title); //Creates the JFrame window
+        frame = new JFrame(title); //Creates the JFrame window
         
         //Sets dimensions
         game.setPreferredSize(new Dimension(w,h));

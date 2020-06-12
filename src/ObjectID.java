@@ -5,5 +5,13 @@ public enum ObjectID {
     Sanitizer(),
     Mask(),
     Gloves,
-    Decor();
+    Decor(),
+    Misc(),
+    Credits(),
+    Mini1(),
+    Mini2(),
+    StartMat(),
+    ExitMat(),
+    WashroomMat(),
+    Info();
 }

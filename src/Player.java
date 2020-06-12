@@ -8,65 +8,73 @@ public class Player extends GameObject{
     
     private boolean[] keyDown = new boolean[4]; //manages key input internally so that movement is attempted each tick
     private boolean spaceDown = false;
-    private BufferedImage characterSprites;
     private BufferedImage playerImage;
-    private SpriteSheet ss;
+    private SpriteSheet ss, ss2;
+    private SpriteSheet[] tut = new SpriteSheet[2];
     private String powerup = "";
     private HUD hud;
-    private int dir = 1, animCycle = 0, mTick = 0, bTick = 0, resistance = 1, powerupTimer = 0;
+    private int dir = 1, animCycle = 0, mTick = 0, bTick = 0, resistance = 1, powerupTimer = 0, gender = 0;
     private int tutStage = 0, tickCount = 0;
-    private boolean kd = false, canMove = true;
+    private boolean kd = false, canMove = true, usedMat = false;
     
     private BufferedImageLoader loader = new BufferedImageLoader();
     private Manager manager;
     private Game game;
 
     //Constructor
-    public Player(int x, int y, int w, int h, int xdispl, int ydispl, BufferedImage img, HUD hud, ID id, Handler handler, Game game) {
+    public Player(int x, int y, int w, int h, int xdispl, int ydispl, BufferedImage img, BufferedImage img2, HUD hud, ID id, Handler handler, Game game) {
         super(x, y, w, h, xdispl, ydispl, id, handler);
         this.hud = hud;
         this.game = game;
+        
+        
+        
         ss = new SpriteSheet(img, 128, 128);
+        ss2 = new SpriteSheet(img2, 128, 128);
         manager = new Manager(-128,350,128,12,0,-104, loader.loadImage("/manager_sprite_sheet.png"), this, ID.CollidableObject, handler);
         playerImage = ss.grabImage(dir, 0, 128, 128);
+        tut[0] = new SpriteSheet(loader.loadImage("obstacle_sprite_sheet.png"),60,60);
+        tut[1] = new SpriteSheet(loader.loadImage("powerup_sprite_sheet.png"),60,60);
     }
     
     public void tick() {
         
         if (Game.gameState == State.Tutorial) {
+            boolean animFinished = manager.getAnimFinished();
+//            boolean animFinished = true;
             if (tutStage == 0) {
                 canMove = false;
-                if (spaceDown && manager.getAnimFinished()) {
+                if (spaceDown && animFinished) {
                     tutStage++;
                     spaceDown = false;
                 }
             }
-            if (tutStage == 1) {
+            else if (tutStage == 1) {
                 canMove = false;
-                if (spaceDown && manager.getAnimFinished()) {
+                if (spaceDown && animFinished) {
                     tutStage++;
                     spaceDown = false;
                     manager.setAnimFinished(false);
                 }
             }
-            if (tutStage == 2) {
+            else if (tutStage == 2) {
                 canMove = false;
-                if (spaceDown && manager.getAnimFinished()) {
+                if (spaceDown && animFinished) {
                     tutStage++;
                     spaceDown = false;
                     canMove = true;
                     new Object(-60, 200, 60, 60, 0, 0, 
-                            new SpriteSheet(loader.loadImage("obstacle_sprite_sheet.png"), 60, 60).grabImage(0, 0, 60, 60), 
+                            tut[0].grabImage(0, 0, 60, 60), 
                             ObjectID.Crowd, ID.NonCollidableObject, handler);
                     new Object(-60, 320, 60, 60, 0, 0, 
-                            new SpriteSheet(loader.loadImage("obstacle_sprite_sheet.png"), 60, 60).grabImage(1, 0, 60, 60), 
+                            tut[0].grabImage(1, 0, 60, 60), 
                             ObjectID.Garbage, ID.NonCollidableObject, handler);
                     new Object(-56, 380, 60, 60, 0, 0, 
-                            new SpriteSheet(loader.loadImage("obstacle_sprite_sheet.png"), 60, 60).grabImage(0, 0, 60, 60), 
+                            tut[0].grabImage(0, 0, 60, 60), 
                             ObjectID.Crowd, ID.NonCollidableObject, handler);
                 }
             }
-            if (tutStage == 3) {
+            else if (tutStage == 3) {
                 tickCount++;
                 if (tickCount > 240) {
                     tickCount = 0;
@@ -78,31 +86,31 @@ public class Player extends GameObject{
                     manager.setAnimFinished(false);
                 }
             }
-            if (tutStage == 4) {
+            else if (tutStage == 4) {
                 canMove = false;
-                if (spaceDown && manager.getAnimFinished()) {
+                if (spaceDown && animFinished) {
                     tutStage++;
                     spaceDown = false;
                 }
             }
-            if (tutStage == 5) {
+            else if (tutStage == 5) {
                 canMove = false;
-                if (spaceDown && manager.getAnimFinished()) {
+                if (spaceDown && animFinished) {
                     tutStage++;
                     spaceDown = false;
                     canMove = true;
                     new Object(-60, 200, 60, 60, 0, 0, 
-                            new SpriteSheet(loader.loadImage("powerup_sprite_sheet.png"), 60, 60).grabImage(0, 0, 60, 60), 
+                            tut[1].grabImage(0, 0, 60, 60), 
                             ObjectID.Mask, ID.NonCollidableObject, handler);
                     new Object(-60, 320, 60, 60, 0, 0, 
-                            new SpriteSheet(loader.loadImage("powerup_sprite_sheet.png"), 60, 60).grabImage(1, 0, 60, 60), 
+                            tut[1].grabImage(1, 0, 60, 60), 
                             ObjectID.Sanitizer, ID.NonCollidableObject, handler);
-                    new Object(-60, 440, 60, 60, 0, 0, 
-                            new SpriteSheet(loader.loadImage("powerup_sprite_sheet.png"), 60, 60).grabImage(2, 0, 60, 60), 
+                    new Object(-60, 380, 60, 60, 0, 0, 
+                            tut[1].grabImage(2, 0, 60, 60), 
                             ObjectID.Gloves, ID.NonCollidableObject, handler);
                 }
             }
-            if (tutStage == 6) {
+            else if (tutStage == 6) {
                 tickCount++;
                 if (tickCount > 240) {
                     tickCount = 0;
@@ -114,18 +122,20 @@ public class Player extends GameObject{
                     manager.setAnimFinished(false);
                 }
             }
-            if (tutStage == 7) {
+            else if (tutStage == 7) {
                 canMove = false;
-                if (spaceDown && manager.getAnimFinished()) {
+                if (spaceDown && animFinished) {
                     tutStage++;
                     spaceDown = false;
                 }
             }
-            if (tutStage == 8) {
+            else if (tutStage == 8) {
                 canMove = false;
-                if (spaceDown && manager.getAnimFinished()) {
+                if (spaceDown && animFinished) {
                     tutStage++;
-                    Game.gameState = State.Game;
+                    x = 400; y = 350;
+                    Game.gameState = State.Lobby;
+                    game.loadLobby();
                     canMove = true;
                     spaceDown = false;
                 }
@@ -133,12 +143,18 @@ public class Player extends GameObject{
             manager.tick();
         }
         
+        if (Game.gameState == State.Lobby) {
+            if (x < 20) {
+                
+            }
+        }
+        
         //Processing key input
         if (canMove) {
-            if (keyDown[0]) { this.setVelY(-5); kd = true;}
-            if (keyDown[1]) { this.setVelY(5); kd = true;}
-            if (keyDown[2]) { this.setVelX(-5); kd = true;}
-            if (keyDown[3]) { this.setVelX(5); kd = true;}
+            if (keyDown[0]) { this.setVelY(-5); dir = 3; kd = true;}
+            if (keyDown[1]) { this.setVelY(5); dir = 0; kd = true;}
+            if (keyDown[2]) { this.setVelX(-5); dir = 1;kd = true;}
+            if (keyDown[3]) { this.setVelX(5); dir = 2; kd = true;}
         }
         //Prevents delay when going in opposite directions
         if (!keyDown[0] && !keyDown[1]) this.setVelY(0);
@@ -173,6 +189,30 @@ public class Player extends GameObject{
                     if (velX > 0) mR = false;
                     if (velX < 0) mL = false;
                 }
+                
+                boolean[] interact;
+                if (dir == 0) {
+                    interact = temp.intersect(this, 0, 5);
+                }
+                else if (dir == 1) {
+                    interact = temp.intersect(this, -5, 0);
+                }
+                else if (dir == 2) {
+                    interact = temp.intersect(this, 5, 0);
+                }
+                else {
+                    interact = temp.intersect(this, 0,-5);
+                }
+                if ((interact[1] || interact[2]) && spaceDown) {
+                    if (((Object) temp).getEffect() == ObjectID.Mini1)
+                        Game.gameState = State.Minigame1;
+                    else if (((Object) temp).getEffect() == ObjectID.Mini2)
+                        Game.gameState = State.Minigame2;
+                    else if (((Object) temp).getEffect() == ObjectID.Info)
+                        Game.gameState = State.Info;
+                    else if (((Object) temp).getEffect() == ObjectID.Credits)
+                        Game.gameState = State.Credits;
+                }
             }
         }
         
@@ -180,8 +220,8 @@ public class Player extends GameObject{
         for (int i = 0; i < handler.object.size(); i++) {
             GameObject temp = handler.object.get(i);
             if (temp.getId() == ID.NonCollidableObject) {
+                Object obj = (Object) temp; // we can assume this won't raise errors because the object was marked with an ID
                 if (this.intersect(temp)) {
-                    Object obj = (Object) temp; // we can assume this won't raise errors because the object was marked with an ID
                     if (obj.getEffect() == ObjectID.Crowd) {
                         hud.incrementRisk(4/resistance);
                     }
@@ -192,14 +232,42 @@ public class Player extends GameObject{
                         powerup = "mask";
                         resistance = 2;
                         powerupTimer = 1200;
+                        hud.incrementScore(20.0f);
                         handler.removeObject(temp);
                     }
                     if (obj.getEffect() == ObjectID.Sanitizer) {
                         hud.incrementRisk(-100);
                         handler.removeObject(temp);
                     }
+                    if (obj.getEffect() == ObjectID.StartMat) {
+                        for (int j = 0; j < handler.object.size(); j++) {
+                            GameObject go = handler.object.get(j);
+                            if (go.getId() != ID.Player) {
+                                handler.object.remove(j);
+                                j--;
+                            }
+                        }
+                        x = 650; y = 350;
+                        Game.gameState = State.Game;
+                    }
+                    if (obj.getEffect() == ObjectID.ExitMat) {
+                        handler.object.clear();
+                        Game.gameState = State.Menu;
+                    }
+                }
+                if (obj.getEffect() == ObjectID.WashroomMat) {
+                    if (this.intersect(temp)) {
+                        if (spaceDown && !usedMat) {
+                            gender ^= 1;
+                            usedMat = true;
+                        }
+                    }
+                    else {
+                        usedMat = false;
+                    }
                 }
             }
+            
         }
         
         if (powerupTimer > 0) {
@@ -235,7 +303,7 @@ public class Player extends GameObject{
         
         //Bound the character in the screen
         x = Game.clamp(x, 0, 800-w);
-        y = Game.clamp(y, 200, 500-h);
+        y = Game.clamp(y, 200, 490-h);
         
         //Animation handling
         if (mTick == 5) {
@@ -243,7 +311,9 @@ public class Player extends GameObject{
             bTick++;
             if (bTick == 2) {
                 bTick = 0;
-                playerImage = ss.grabImage(dir, animCycle, 128, 128);
+                hud.incrementScore(0.2f);
+                if (gender == 0) playerImage = ss.grabImage(dir, animCycle, 128, 128);
+                else playerImage = ss2.grabImage(dir, animCycle, 128, 128);
                 if (kd) {
                     animCycle++;
                     animCycle %= 4;
@@ -259,7 +329,7 @@ public class Player extends GameObject{
         mTick++;
         
         if (hud.getRisk() == 1000) {
-            Game.gameState = State.Menu;
+            Game.gameState = State.GameOver;
             handler.object.clear();
         }
     }
@@ -292,6 +362,10 @@ public class Player extends GameObject{
     
     public int getTutStage() {
         return tutStage;
+    }
+    
+    public int getScore() {
+        return (int) hud.getScore();
     }
 
 }

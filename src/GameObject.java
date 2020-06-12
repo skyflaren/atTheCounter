@@ -21,6 +21,18 @@ public abstract class GameObject {
         handler.addObject(this);
     }
     
+    public GameObject(int x, int y, int w, int h, int xdispl, int ydispl, int ind, ID id, Handler handler) {
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+        this.xdispl = xdispl; //Displacement of the sprite from its collision box
+        this.ydispl = ydispl; 
+        this.id = id;
+        this.handler = handler;
+        handler.object.add(ind,this);
+    }
+    
     public abstract void tick();
     public abstract void render(Graphics g);
     
@@ -49,7 +61,7 @@ public abstract class GameObject {
     }
     public int getX() {
         return x;
-        }
+    }
     public int getY() {
         return y;
     }

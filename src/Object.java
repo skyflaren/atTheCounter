@@ -14,13 +14,19 @@ public class Object extends GameObject{
         sprite = img;
     }
     
+    public Object(int x, int y, int w, int h, int xdispl, int ydispl, int ind, BufferedImage img, ObjectID effect, ID id, Handler handler) {
+        super(x, y, w, h, xdispl, ydispl, ind, id, handler);
+        this.effect = effect;
+        sprite = img;
+    }
+    
     public ObjectID getEffect() {
         return effect;
     }
 
     public void tick() {
         if (Game.gameState == State.Game || Game.gameState == State.Tutorial) {
-            x += 4;
+            x += Game.objectSpeed;
         }
     }
 

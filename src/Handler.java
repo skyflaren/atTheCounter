@@ -24,7 +24,7 @@ public class Handler {
     //Calls each objects corresponding render method
     public void render(Graphics g) {
         for (int i = 0; i < object.size(); i++) {
-            GameObject temp =  object.get(i);
+            GameObject temp = object.get(i);
             temp.render(g);
         }
     }

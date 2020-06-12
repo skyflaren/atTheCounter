@@ -28,6 +28,19 @@ public class KeyInput extends KeyAdapter{
                 if (key == KeyEvent.VK_SPACE) player.setSpaceDown(true);
             }
         }
+        
+        if (Game.gameState == State.Minigame1 || Game.gameState == State.Minigame2 || Game.gameState == State.Info || Game.gameState == State.Credits) {
+            if (key == KeyEvent.VK_B) {
+                Game.gameState = State.Lobby;
+            }
+        }
+        
+//        if (Game.gameState == State.Minigame1) {
+//            if (key == KeyEvent.VK_W) 
+//            if (key == KeyEvent.VK_S) 
+//            if (key == KeyEvent.VK_A) 
+//            if (key == KeyEvent.VK_D) 
+//        }
     }
     
     //Listens for key release
