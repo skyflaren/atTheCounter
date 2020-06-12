@@ -26,10 +26,12 @@ public class Game extends Canvas implements Runnable{
     
     //Loads Images
     private BufferedImage bg, powerups, obstacles, decor, charSprites, managerSprites, mopBucket, counterLeft, counterRight, menuImage, gameOverImage, lobbyBg,
-    creditsImage, infoImage, exitMat, startMat, soupImage, washroomMat;
+    creditsImage, infoImage, exitMat, startMat, soupImage, washroomMat, soupTurn;
     private BufferedImageLoader loader;
+    
+    private Minigame1 mg1;
         
-    public static State gameState = State.Menu;
+    public static State gameState = State.Minigame1;
     public static int objectSpeed = 4;
     
     //Constructor, initializes all the objects and assets
@@ -54,6 +56,9 @@ public class Game extends Canvas implements Runnable{
         exitMat = loader.loadImage("/exit_mat.png");
         startMat = loader.loadImage("/start_mat.png");
         washroomMat = loader.loadImage("/washroom_mat.png");
+        soupTurn = loader.loadImage("/soup_turning.png");
+        
+        mg1 = new Minigame1(soupTurn);
         
         try {
             GraphicsEnvironment ge = 
@@ -67,7 +72,8 @@ public class Game extends Canvas implements Runnable{
         handler = new Handler();
         menu = new Menu(this, handler);
         
-        this.addKeyListener(new KeyInput(handler));
+//        this.addKeyListener(new KeyInput(handler));
+        this.addKeyListener(new KeyInput(handler, mg1));
         this.addMouseListener(menu);
         
         window = new Window(WIDTH, HEIGHT, "AT THE COUNTER", this);
@@ -136,7 +142,7 @@ public class Game extends Canvas implements Runnable{
             handler.tick();
         }
         else if (gameState == State.Minigame1) { // Mop
-//            minigame1.tick();
+            mg1.tick();
         }
         else if (gameState == State.Minigame2) { // Soup
             //minigame2.tick();
@@ -182,7 +188,7 @@ public class Game extends Canvas implements Runnable{
         else if (gameState == State.Minigame1) {
             g.setColor(Color.BLACK);
             g.fillRect(0, 0, WIDTH, HEIGHT);
-            //minigame1.render()
+            mg1.render(g);
         }
         else if (gameState == State.Minigame2) {
             g.setColor(Color.BLACK);

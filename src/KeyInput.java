@@ -5,10 +5,16 @@ import java.awt.event.KeyEvent;
 public class KeyInput extends KeyAdapter{
     
     private Handler handler;
+    private Minigame1 mg1;
     
     //Constructor
     public KeyInput(Handler handler) {
         this.handler = handler;
+    }
+    
+    public KeyInput(Handler handler, Minigame1 mg1) {
+        this.handler = handler;
+        this.mg1 = mg1;
     }
 
     //Listens for key input
@@ -35,12 +41,10 @@ public class KeyInput extends KeyAdapter{
             }
         }
         
-//        if (Game.gameState == State.Minigame1) {
-//            if (key == KeyEvent.VK_W) 
-//            if (key == KeyEvent.VK_S) 
-//            if (key == KeyEvent.VK_A) 
-//            if (key == KeyEvent.VK_D) 
-//        }
+        if (Game.gameState == State.Minigame1) {
+            if (key == KeyEvent.VK_A) mg1.addTilt(1.1);
+            if (key == KeyEvent.VK_D) mg1.addTilt(-1.1);
+        }
     }
     
     //Listens for key release
