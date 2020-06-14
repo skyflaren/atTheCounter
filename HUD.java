@@ -30,7 +30,10 @@ public class HUD {
     }
     
     public void incrementRisk(int inc) {
-        if (Game.gameState != State.Tutorial) risk += inc;
+        System.out.println(risk + " " + inc);
+        if (Game.gameState == State.Lobby) risk = Game.clamp(risk+inc, 0, 999);
+        else if (Game.gameState != State.Tutorial) risk += inc;
+        System.out.println(risk + " " + inc);
     }
     
     public void incrementScore(float inc) {

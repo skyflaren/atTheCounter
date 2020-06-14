@@ -10,7 +10,6 @@ public class SpriteSheet {
         this.sprite = ss;
         this.rowsz = rowsz;
         this.colsz = colsz;
-        System.out.println(ss + " " + rowsz + " " + colsz);
     }
     
     //Helper method to get images from the spritesheet

@@ -8,13 +8,13 @@ public class Player extends GameObject{
     
     private boolean[] keyDown = new boolean[4]; //manages key input internally so that movement is attempted each tick
     private boolean spaceDown = false;
-    private BufferedImage playerImage;
-    private SpriteSheet ss, ss2;
+    private BufferedImage playerImage, indicator;
+    private SpriteSheet ss, ss2, prompts;
     private SpriteSheet[] tut = new SpriteSheet[2];
     private String powerup = "";
     private HUD hud;
     private int dir = 1, animCycle = 0, mTick = 0, bTick = 0, resistance = 1, powerupTimer = 0, gender = 0;
-    private int tutStage = 0, tickCount = 0;
+    private int tutStage = 0, tickCount = 0, displayIndicator = 0;
     private boolean kd = false, canMove = true, usedMat = false;
     
     private BufferedImageLoader loader = new BufferedImageLoader();
@@ -32,6 +32,9 @@ public class Player extends GameObject{
         ss = new SpriteSheet(img, 128, 128);
         ss2 = new SpriteSheet(img2, 128, 128);
         manager = new Manager(-128,350,128,12,0,-104, loader.loadImage("/manager_sprite_sheet.png"), this, ID.CollidableObject, handler);
+        indicator = loader.loadImage("/indicator.png");
+        prompts = new SpriteSheet(loader.loadImage("/prompts.png"), 15, 200);
+        
         playerImage = ss.grabImage(dir, 0, 128, 128);
         tut[0] = new SpriteSheet(loader.loadImage("obstacle_sprite_sheet.png"),60,60);
         tut[1] = new SpriteSheet(loader.loadImage("powerup_sprite_sheet.png"),60,60);
@@ -163,6 +166,7 @@ public class Player extends GameObject{
         boolean mU = true, mD = true, mL = true, mR = true;
         
         //Handle object collision for solid objects
+        displayIndicator = 0;
         for (int i = 0; i < handler.object.size(); i++) {
             GameObject temp = handler.object.get(i);
             if (temp.getId() == ID.CollidableObject) {
@@ -204,14 +208,26 @@ public class Player extends GameObject{
                     interact = temp.intersect(this, 0,-5);
                 }
                 if ((interact[1] || interact[2]) && spaceDown) {
-                    if (((Object) temp).getEffect() == ObjectID.Mini1)
+                    if (((Object) temp).getEffect() == ObjectID.Mini1){
+                        displayIndicator = 0;
                         Game.gameState = State.Minigame1;
+                    }
                     else if (((Object) temp).getEffect() == ObjectID.Mini2)
                         Game.gameState = State.Minigame2;
                     else if (((Object) temp).getEffect() == ObjectID.Info)
                         Game.gameState = State.Info;
                     else if (((Object) temp).getEffect() == ObjectID.Credits)
                         Game.gameState = State.Credits;
+                }
+                else if(interact[1] || interact[2]){
+                    if (((Object) temp).getEffect() == ObjectID.Mini1)
+                        displayIndicator = 1;
+                    else if (((Object) temp).getEffect() == ObjectID.Mini2)
+                        displayIndicator = 1;
+                    else if (((Object) temp).getEffect() == ObjectID.Info)
+                        displayIndicator = 3;
+                    else if (((Object) temp).getEffect() == ObjectID.Credits)
+                        displayIndicator = 4;
                 }
             }
         }
@@ -261,6 +277,8 @@ public class Player extends GameObject{
                             gender ^= 1;
                             usedMat = true;
                         }
+                        else if(!usedMat)
+                            displayIndicator = 2;
                     }
                     else {
                         usedMat = false;
@@ -341,6 +359,7 @@ public class Player extends GameObject{
         g.drawImage(playerImage, x+xdispl, y+ydispl, null);
         if (Game.gameState == State.Tutorial) manager.render(g);
         if (Game.gameState != State.Tutorial) hud.render(g);
+        if (displayIndicator > 0) g.drawImage(prompts.grabImage(displayIndicator-1, 0, 200, 15), 8 , 460, null);
     }
     
     //Helper methods
@@ -366,6 +385,10 @@ public class Player extends GameObject{
     
     public int getScore() {
         return (int) hud.getScore();
+    }
+    
+    public void incrementRisk(int val){
+        hud.incrementRisk(val);
     }
 
 }

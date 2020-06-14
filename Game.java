@@ -26,12 +26,13 @@ public class Game extends Canvas implements Runnable{
     
     //Loads Images
     private BufferedImage bg, powerups, obstacles, decor, charSprites, managerSprites, mopBucket, counterLeft, counterRight, menuImage, gameOverImage, lobbyBg,
-    creditsImage, infoImage, exitMat, startMat, soupImage, washroomMat, soupTurn;
+    creditsImage, infoImage, exitMat, startMat, soupImage, washroomMat, soupTurn, soupBg;
     private BufferedImageLoader loader;
     
     private Minigame1 mg1;
-        
-    public static State gameState = State.Minigame1;
+//    private Minigame2 mg2;
+    
+    public static State gameState = State.Menu;
     public static int objectSpeed = 4;
     
     //Constructor, initializes all the objects and assets
@@ -57,6 +58,8 @@ public class Game extends Canvas implements Runnable{
         startMat = loader.loadImage("/start_mat.png");
         washroomMat = loader.loadImage("/washroom_mat.png");
         soupTurn = loader.loadImage("/soup_turning.png");
+        soupBg = loader.loadImage("/soup_bg.png");
+        
         
         mg1 = new Minigame1(soupTurn);
         
@@ -77,6 +80,9 @@ public class Game extends Canvas implements Runnable{
         this.addMouseListener(menu);
         
         window = new Window(WIDTH, HEIGHT, "AT THE COUNTER", this);
+        
+//        startLevel();
+//        loadLobby();
     }
     
     public void close() {
@@ -141,10 +147,16 @@ public class Game extends Canvas implements Runnable{
         else if (gameState == State.Lobby) {
             handler.tick();
         }
-        else if (gameState == State.Minigame1) { // Mop
+        else if (gameState == State.Minigame1) { // Soup
             mg1.tick();
+            if(Math.floor(mg1.getTime()) <= 0){
+                gameState = State.Lobby;
+                loadLobby();
+                player.incrementRisk((mg1.getScore()-1400)/7);
+                mg1.reset();
+            }
         }
-        else if (gameState == State.Minigame2) { // Soup
+        else if (gameState == State.Minigame2) { // Mop
             //minigame2.tick();
         }
         else if (gameState == State.Info) {
@@ -187,7 +199,7 @@ public class Game extends Canvas implements Runnable{
         }
         else if (gameState == State.Minigame1) {
             g.setColor(Color.BLACK);
-            g.fillRect(0, 0, WIDTH, HEIGHT);
+            g.drawImage(soupBg, 0, 0, null);
             mg1.render(g);
         }
         else if (gameState == State.Minigame2) {
@@ -236,6 +248,9 @@ public class Game extends Canvas implements Runnable{
     public void loadLobby() {
         new Object(140, 235, 50, 27, 0, 0,
                 soupImage,
+                ObjectID.Mini1, ID.CollidableObject, handler);
+        new Object(400, 390, 82, 94, 0, 0,
+                mopBucket,
                 ObjectID.Mini2, ID.CollidableObject, handler);
         new Object(0, 200, 46, 90, 0, 0,
                 counterLeft,
@@ -243,9 +258,6 @@ public class Game extends Canvas implements Runnable{
         new Object(46, 234, 244, 56, -46, -34,
                 counterRight,
                 ObjectID.Misc, ID.CollidableObject, handler);
-        new Object(400, 390, 82, 94, 0, 0, 
-                mopBucket, 
-                ObjectID.Mini1, ID.CollidableObject, handler);
         new Object(300, 106, 123, 94, 0, -64,
                 infoImage,
                 ObjectID.Info, ID.CollidableObject, handler);
@@ -265,6 +277,10 @@ public class Game extends Canvas implements Runnable{
     
     //Helper method that squishes values into a specified range
     public static int clamp(int val, int min, int max) {
+        return Math.min(max, Math.max(val, min));
+    }
+    
+    public static double clamp(double val, double min, double max) {
         return Math.min(max, Math.max(val, min));
     }
     
