@@ -179,12 +179,6 @@ public class Game extends Canvas implements Runnable{
                 }
             }
         }
-        else if (gameState == State.Info) {
-            //info.tick();
-        }
-        else if (gameState == State.Credits) {
-            //credits.tick();
-        }
         else if (gameState == State.Game) {
             handler.tick();
             gameObjectSpawner.tick();
