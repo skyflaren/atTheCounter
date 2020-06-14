@@ -30,13 +30,20 @@ public class Game extends Canvas implements Runnable{
         mopIntro, creditsPage, brownBG;
     private BufferedImageLoader loader;
     
+    //Instances for the minigames
     private Minigame1 mg1;
     private Minigame2 mg2;
     
+    //Used to animate the risk bar change
     private int changeRisk = 0;
     
-    public static State gameState = State.Lobby;
+    //Controls flow of our game
+    public static State gameState = State.Menu;
+    
+    //Increases over time to speed up object movements
     public static int objectSpeed = 4;
+    
+    //False for instructions page, true for gameplay (for the minigames)
     public static boolean startOne = false, startTwo = false;
     
     //Constructor, initializes all the objects and assets
@@ -75,8 +82,7 @@ public class Game extends Canvas implements Runnable{
         mg2 = new Minigame2(mopTiles);
         
         try {
-            GraphicsEnvironment ge = 
-                GraphicsEnvironment.getLocalGraphicsEnvironment();
+            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
             Font wonder = Font.createFont(Font.TRUETYPE_FONT, getClass().getClassLoader().getResourceAsStream("wonder.ttf"));
             ge.registerFont(wonder);
        } catch (IOException|FontFormatException e) {
@@ -90,10 +96,6 @@ public class Game extends Canvas implements Runnable{
         this.addMouseListener(menu);
         
         window = new Window(WIDTH, HEIGHT, "AT THE COUNTER", this);
-        
-        loadLobby();
-        startLevel();
-        
     }
     
     public void close() {
@@ -158,7 +160,7 @@ public class Game extends Canvas implements Runnable{
         else if (gameState == State.Lobby) {
             handler.tick();
             
-            if(changeRisk == 0){
+            if(changeRisk == 0){    //After the animation, allow the player to move again
                 player.setCanMove(true);
             }
             else{   //Animate risk bar change after minigame
@@ -170,10 +172,10 @@ public class Game extends Canvas implements Runnable{
         else if (gameState == State.Minigame1) { // Soup
             if(startOne == true){
                 mg1.tick();
-                if(Math.floor(mg1.getTime()) <= 0){
+                if(Math.floor(mg1.getTime()) <= 0){ //When the minigame is over, reload the lobby, and prepare to show risk bar animation
                     gameState = State.Lobby;
                     loadLobby();
-                    changeRisk = ((mg1.getScore()-1400)/7);
+                    changeRisk = clamp((mg1.getScore()-1400)/7, -200, 200);
                     mg1.reset();
                     startOne = false;
                     player.setCanMove(false);
@@ -186,7 +188,7 @@ public class Game extends Canvas implements Runnable{
                 if(Math.floor(mg2.getTime()) <= 0){
                     gameState = State.Lobby;
                     loadLobby();
-                    changeRisk = ((mg2.getScore()-1400)/7);
+                    changeRisk = clamp((mg2.getScore()-1400)/7, -200, 200);
                     mg2.reset();
                     startTwo = false;
                     player.setCanMove(false);
@@ -226,11 +228,11 @@ public class Game extends Canvas implements Runnable{
             handler.render(g);
         }
         else if (gameState == State.Minigame1) {
-            if(startOne == true){
+            if(startOne == true){   //Main gameplay
                 g.drawImage(soupBg, 0, 0, null);
                 mg1.render(g);
             }
-            else{
+            else{   //Instructions page
                 g.drawImage(soupIntro, 0, 0, null);
             }
         }
@@ -245,11 +247,9 @@ public class Game extends Canvas implements Runnable{
         }
         else if (gameState == State.Info) {
             g.drawImage(infoPage, 0, 0, null);
-            //info.render()
         }
         else if (gameState == State.Credits) {
             g.drawImage(creditsPage, 0, 0, null);
-            //credits.render()
         }
         else if (gameState == State.Game) {
             g.drawImage(bg,0,0,null);

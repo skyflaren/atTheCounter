@@ -44,10 +44,7 @@ public class HUD {
 
     public void tick() {
         risk = Game.clamp(risk, 0, 1000);
-        if (score > 800) Game.objectSpeed = 8;
-        else if (score > 400) Game.objectSpeed = 6;
-        else if (score > 100) Game.objectSpeed = 5;
-        else Game.objectSpeed = 4;
+        Game.objectSpeed = 4 + (int)(score/50);
 
         
 //        score = 1001;
