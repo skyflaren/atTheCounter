@@ -25,15 +25,17 @@ public class Game extends Canvas implements Runnable{
     private Player player;
     
     //Loads Images
-    private BufferedImage bg, powerups, obstacles, decor, charSprites, managerSprites, mopBucket, counterLeft, counterRight, menuImage, gameOverImage, lobbyBg,
-    creditsImage, infoImage, exitMat, startMat, soupImage, washroomMat, soupTurn, soupBg;
+    private BufferedImage bg, powerups, obstacles, decor, charSprites, managerSprites, mopBucket, counterLeft, counterRight, menuImage, gameOverImage, lobbyBg, creditsImage, infoImage,
+        exitMat, startMat, soupImage, washroomMat, soupTurn, soupBg, mopTiles, infoPage, soupIntro,
+        mopIntro, creditsPage, brownBG;
     private BufferedImageLoader loader;
     
     private Minigame1 mg1;
-//    private Minigame2 mg2;
+    private Minigame2 mg2;
     
-    public static State gameState = State.Menu;
+    public static State gameState = State.Lobby;
     public static int objectSpeed = 4;
+    public static boolean startOne = false, startTwo = false;
     
     //Constructor, initializes all the objects and assets
     public Game() {
@@ -59,9 +61,16 @@ public class Game extends Canvas implements Runnable{
         washroomMat = loader.loadImage("/washroom_mat.png");
         soupTurn = loader.loadImage("/soup_turning.png");
         soupBg = loader.loadImage("/soup_bg.png");
+        mopTiles = loader.loadImage("/mop_tiles.png");
+        infoPage = loader.loadImage("/info_page.png");
+        soupIntro = loader.loadImage("/soup_intro.png");
+        mopIntro = loader.loadImage("/mop_intro.png");
+        creditsPage = loader.loadImage("/credits_page.png");
+        brownBG = loader.loadImage("/brown_bg.png");
         
         
         mg1 = new Minigame1(soupTurn);
+        mg2 = new Minigame2(mopTiles);
         
         try {
             GraphicsEnvironment ge = 
@@ -75,14 +84,13 @@ public class Game extends Canvas implements Runnable{
         handler = new Handler();
         menu = new Menu(this, handler);
         
-//        this.addKeyListener(new KeyInput(handler));
-        this.addKeyListener(new KeyInput(handler, mg1));
+        this.addKeyListener(new KeyInput(handler, mg1, mg2));
         this.addMouseListener(menu);
         
         window = new Window(WIDTH, HEIGHT, "AT THE COUNTER", this);
         
-//        startLevel();
-//        loadLobby();
+        startLevel();
+        loadLobby();
     }
     
     public void close() {
@@ -148,16 +156,28 @@ public class Game extends Canvas implements Runnable{
             handler.tick();
         }
         else if (gameState == State.Minigame1) { // Soup
-            mg1.tick();
-            if(Math.floor(mg1.getTime()) <= 0){
-                gameState = State.Lobby;
-                loadLobby();
-                player.incrementRisk((mg1.getScore()-1400)/7);
-                mg1.reset();
+            if(startOne == true){
+                mg1.tick();
+                if(Math.floor(mg1.getTime()) <= 0){
+                    gameState = State.Lobby;
+                    loadLobby();
+                    player.incrementRisk((mg1.getScore()-1400)/7);
+                    mg1.reset();
+                    startOne = false;
+                }
             }
         }
         else if (gameState == State.Minigame2) { // Mop
-            //minigame2.tick();
+            if(startTwo == true){
+                mg2.tick();
+                if(Math.floor(mg2.getTime()) <= 0){
+                    gameState = State.Lobby;
+                    loadLobby();
+                    player.incrementRisk((mg2.getScore()-1400)/7);
+                    mg2.reset();
+                    startTwo = false;
+                }
+            }
         }
         else if (gameState == State.Info) {
             //info.tick();
@@ -198,23 +218,29 @@ public class Game extends Canvas implements Runnable{
             handler.render(g);
         }
         else if (gameState == State.Minigame1) {
-            g.setColor(Color.BLACK);
-            g.drawImage(soupBg, 0, 0, null);
-            mg1.render(g);
+            if(startOne == true){
+                g.drawImage(soupBg, 0, 0, null);
+                mg1.render(g);
+            }
+            else{
+                g.drawImage(soupIntro, 0, 0, null);
+            }
         }
         else if (gameState == State.Minigame2) {
-            g.setColor(Color.BLACK);
-            g.fillRect(0, 0, WIDTH, HEIGHT);
-            //minigame2.render()
+            if(startTwo == true){
+                g.drawImage(brownBG, 0, 0, null);
+                mg2.render(g);
+            }
+            else{
+                g.drawImage(mopIntro, 0, 0, null);
+            }
         }
         else if (gameState == State.Info) {
-            g.setColor(Color.BLACK);
-            g.fillRect(0, 0, WIDTH, HEIGHT);
+            g.drawImage(infoPage, 0, 0, null);
             //info.render()
         }
         else if (gameState == State.Credits) {
-            g.setColor(Color.BLACK);
-            g.fillRect(0, 0, WIDTH, HEIGHT);
+            g.drawImage(creditsPage, 0, 0, null);
             //credits.render()
         }
         else if (gameState == State.Game) {

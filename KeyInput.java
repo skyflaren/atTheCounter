@@ -6,15 +6,17 @@ public class KeyInput extends KeyAdapter{
     
     private Handler handler;
     private Minigame1 mg1;
+    private Minigame2 mg2;
     
     //Constructor
     public KeyInput(Handler handler) {
         this.handler = handler;
     }
     
-    public KeyInput(Handler handler, Minigame1 mg1) {
+    public KeyInput(Handler handler, Minigame1 mg1, Minigame2 mg2) {
         this.handler = handler;
         this.mg1 = mg1;
+        this.mg2 = mg2;
     }
 
     //Listens for key input
@@ -35,15 +37,33 @@ public class KeyInput extends KeyAdapter{
             }
         }
         
-        if (Game.gameState == State.Minigame1 || Game.gameState == State.Minigame2 || Game.gameState == State.Info || Game.gameState == State.Credits) {
+        if ((Game.gameState == State.Minigame1 && Game.startOne == false) || (Game.gameState == State.Minigame2 && Game.startTwo == false) || Game.gameState == State.Info || Game.gameState == State.Credits) {
             if (key == KeyEvent.VK_B) {
                 Game.gameState = State.Lobby;
             }
         }
         
-        if (Game.gameState == State.Minigame1) {
+        if (Game.gameState == State.Minigame1){
+            if (key == KeyEvent.VK_SPACE) Game.startOne = true;
+            
             if (key == KeyEvent.VK_A) mg1.addTilt(1.1);
             if (key == KeyEvent.VK_D) mg1.addTilt(-1.1);
+        }
+        
+        if(Game.gameState == State.Minigame2){
+            if (key == KeyEvent.VK_SPACE) Game.startTwo = true;
+            
+            if(key == KeyEvent.VK_Q) mg2.clean(0, 0);
+            if(key == KeyEvent.VK_W) mg2.clean(0, 1);
+            if(key == KeyEvent.VK_E) mg2.clean(0, 2);
+            
+            if(key == KeyEvent.VK_A) mg2.clean(1, 0);
+            if(key == KeyEvent.VK_S) mg2.clean(1, 1);
+            if(key == KeyEvent.VK_D) mg2.clean(1, 2);
+            
+            if(key == KeyEvent.VK_Z) mg2.clean(2, 0);
+            if(key == KeyEvent.VK_X) mg2.clean(2, 1);
+            if(key == KeyEvent.VK_C) mg2.clean(2, 2);
         }
     }
     

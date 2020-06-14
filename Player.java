@@ -8,7 +8,7 @@ public class Player extends GameObject{
     
     private boolean[] keyDown = new boolean[4]; //manages key input internally so that movement is attempted each tick
     private boolean spaceDown = false;
-    private BufferedImage playerImage, indicator;
+    private BufferedImage playerImage;
     private SpriteSheet ss, ss2, prompts;
     private SpriteSheet[] tut = new SpriteSheet[2];
     private String powerup = "";
@@ -32,7 +32,6 @@ public class Player extends GameObject{
         ss = new SpriteSheet(img, 128, 128);
         ss2 = new SpriteSheet(img2, 128, 128);
         manager = new Manager(-128,350,128,12,0,-104, loader.loadImage("/manager_sprite_sheet.png"), this, ID.CollidableObject, handler);
-        indicator = loader.loadImage("/indicator.png");
         prompts = new SpriteSheet(loader.loadImage("/prompts.png"), 15, 200);
         
         playerImage = ss.grabImage(dir, 0, 128, 128);
@@ -239,10 +238,10 @@ public class Player extends GameObject{
                 Object obj = (Object) temp; // we can assume this won't raise errors because the object was marked with an ID
                 if (this.intersect(temp)) {
                     if (obj.getEffect() == ObjectID.Crowd) {
-                        hud.incrementRisk(4/resistance);
+                        hud.incrementRisk(6/resistance);
                     }
                     if (obj.getEffect() == ObjectID.Garbage) {
-                        hud.incrementRisk(2/resistance);
+                        hud.incrementRisk(3/resistance);
                     }
                     if (obj.getEffect() == ObjectID.Mask || obj.getEffect() == ObjectID.Gloves) {
                         powerup = "mask";

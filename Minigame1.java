@@ -21,7 +21,7 @@ public class Minigame1 {
     
     public void reset(){
         tilt = 4.0;
-        timeLeft = 702;
+        timeLeft = 700;
         score = 0;
         moves = 0;
         dir = 0;
