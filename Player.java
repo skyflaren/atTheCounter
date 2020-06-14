@@ -389,5 +389,9 @@ public class Player extends GameObject{
     public void incrementRisk(int val){
         hud.incrementRisk(val);
     }
+    
+    public void setCanMove(boolean bol){
+        canMove = bol;
+    }
 
 }

@@ -33,6 +33,8 @@ public class Game extends Canvas implements Runnable{
     private Minigame1 mg1;
     private Minigame2 mg2;
     
+    private int changeRisk = 0;
+    
     public static State gameState = State.Lobby;
     public static int objectSpeed = 4;
     public static boolean startOne = false, startTwo = false;
@@ -89,8 +91,9 @@ public class Game extends Canvas implements Runnable{
         
         window = new Window(WIDTH, HEIGHT, "AT THE COUNTER", this);
         
-        startLevel();
         loadLobby();
+        startLevel();
+        
     }
     
     public void close() {
@@ -154,6 +157,15 @@ public class Game extends Canvas implements Runnable{
         }
         else if (gameState == State.Lobby) {
             handler.tick();
+            
+            if(changeRisk == 0){
+                player.setCanMove(true);
+            }
+            else{   //Animate risk bar change after minigame
+                player.setCanMove(false);
+                player.incrementRisk(1 * (changeRisk > 0 ? 1 : -1));
+                changeRisk += (changeRisk > 0 ? -1 : 1);
+            }
         }
         else if (gameState == State.Minigame1) { // Soup
             if(startOne == true){
@@ -161,9 +173,10 @@ public class Game extends Canvas implements Runnable{
                 if(Math.floor(mg1.getTime()) <= 0){
                     gameState = State.Lobby;
                     loadLobby();
-                    player.incrementRisk((mg1.getScore()-1400)/7);
+                    changeRisk = ((mg1.getScore()-1400)/7);
                     mg1.reset();
                     startOne = false;
+                    player.setCanMove(false);
                 }
             }
         }
@@ -173,9 +186,10 @@ public class Game extends Canvas implements Runnable{
                 if(Math.floor(mg2.getTime()) <= 0){
                     gameState = State.Lobby;
                     loadLobby();
-                    player.incrementRisk((mg2.getScore()-1400)/7);
+                    changeRisk = ((mg2.getScore()-1400)/7);
                     mg2.reset();
                     startTwo = false;
+                    player.setCanMove(false);
                 }
             }
         }
